@@ -15,7 +15,7 @@ from utils import (
 )
 
 from numba.typed import List 
-from numba import njit
+from numba import njit, jit
 
 # MANAGER = multiprocessing.Manager()
 
@@ -76,10 +76,10 @@ def getValuesForSubproblems(
     # examples_split = [EXAMPLES[i[0]:i[1]] for i in parts]
     # Il problema è la lista condivisa
     for subprob in subProblemsColIndexes:
-        print(f"Doing {subprob}\n")
+        # print(f"Doing {subprob}\n")
         subProblemsData[subprob] = {}
         subProblemsData[subprob]["n"] = sub_problem_cardinality
-        subProblemsData[subprob]["states"] = [STATES[i] for i in subprob]
+        subProblemsData[subprob]["states"] = array([STATES[i] for i in subprob])
         
         #multiprocess test
         # l1 = []
@@ -96,7 +96,7 @@ def getValuesForSubproblems(
         
         #Normal way
         
-        subProblemsData[subprob]["examples"] = filter_example(subprob, EXAMPLES, EXAMPLES_LENGHT)
+        subProblemsData[subprob]["examples"] = array(filter_example(subprob, EXAMPLES, EXAMPLES_LENGHT))
         # subProblemsData[subprob]["examples"] = []
         # for example in EXAMPLES:
         #    subProblemsData[subprob]["examples"].append([example[i] for i in subprob])
@@ -148,15 +148,16 @@ def getValuesForSubproblems(
        
     return subProblemsData, N
 
-@njit
+@jit(nopython= True)
 def filter_example(subprob, Examples, lenght):
-    res = List()
+    res = []
     for i in range(lenght):
-        sub_res = List()
+        sub_res = []
         for j in range(len(subprob)):
             sub_res.append(Examples[i][subprob[j]])
         res.append(sub_res)
     return res
+
 
 def getExamples(filename):
     with open(filename, "r") as f:
@@ -168,15 +169,15 @@ def getExamples(filename):
         states = [int(si) for si in info[1 : n + 1]]
         # get examples
         # examples = []
-        examples = List()
+        examples = []
         for i in range(len(lines)):
             ls = lines[i].split(" ")
-            l2 = List()
+            l2 = []
             for j in range(len(ls)):
                 l2.append(int(ls[j]))
             examples.append(l2)
             # examples += [[int(x) for x in ls]]
-    return examples, n, states
+    return array(examples), n, array(states)
 
 
 # subsets with max size m=2
@@ -242,7 +243,7 @@ def calcAlphaijSum(alpha, parentSet, i, j, states):
     return sum
 
 
-
+@jit(nopython= True)
 def calcJthState(j, parentSet, states):
     # ASSUMPTION: all the variables have the same number of states,
     # if this is false, some combinations will be ignored
@@ -253,6 +254,7 @@ def calcJthState(j, parentSet, states):
     sp1 = j % states[p0]
     return sp0, sp1
 
+@jit(nopython= True)
 def calcNijk(examples, parentSet, i, j, k, states):
     count = 0
     for example in examples:
