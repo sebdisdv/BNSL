@@ -1,0 +1,30 @@
+Expected adjacency matrix:
+[0, 0, 1, 0, 0]
+[0, 0, 1, 0, 0]
+[0, 0, 0, 1, 1]
+[0, 0, 0, 0, 0]
+[0, 0, 0, 0, 0]
+
+Solution adjacency matrix:
+[0, 0, 1, 0, 0]
+[0, 0, 1, 0, 0]
+[0, 0, 0, 1, 1]
+[0, 0, 0, 0, 0]
+[0, 0, 0, 0, 0]
+
+Expected solution:
+expY = -1915.02880859375
+expX = [0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+
+Minimum found:
+minY = -1915.02880859375
+minX = [0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0]
+
+minY/expY = 1.0
+
+Method: SA
+Number of reads: 100
+Occurrencies of minX: 1
+Found minX at read: 75
+QUBO formulation time: 1.201768
+Annealing time: 0.090631

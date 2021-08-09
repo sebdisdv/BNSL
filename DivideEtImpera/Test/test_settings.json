@@ -1,0 +1,16 @@
+{
+    "methods": ["SA", "QA"],
+    "nReads": 100,
+    "annealTime": 1,
+    "alpha": "1/(ri*qi)",
+    "subProblemCardinality": 3,
+    "datasets": {
+        "LC": [
+            "BNSL/DivideEtImpera/Test/datasets/LC10K1.txt"
+
+        ],
+        "WASTE": [
+
+        ]
+    }
+}

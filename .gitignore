@@ -127,3 +127,9 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Logs
+/DivideEtImpera/Test/Logs
+/DivideEtImpera/Test/LogsArchive
+/DivideEtImpera/Test/PDFs
+/DivideEtImpera/Test/Graphs
