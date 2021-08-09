@@ -6,7 +6,7 @@
     "subProblemCardinality": 3,
     "datasets": {
         "LC": [
-            "BNSL/DivideEtImpera/Test/datasets/LC10K1.txt"
+            "DivideEtImpera/Test/datasets/LC10K1.txt"
 
         ],
         "WASTE": [

@@ -16,7 +16,7 @@ from dwaveSolver import dwaveSolve
 from utils import SPLIT_METHODS, getAdjMat, recompose, save_graph
 from pprint import pformat
 
-with open("BNSL/DivideEtImpera/Test/test_settings.json", "r") as js:
+with open("DivideEtImpera/Test/test_settings.json", "r") as js:
     SETTINGS = json.load(js)
 
 
@@ -90,7 +90,7 @@ def solve_SA(logs_path):
 
 
 def main():
-    log_path = os.path.join("BNSL/DivideEtImpera/Test/Logs", str(datetime.datetime.now())[:19])
+    log_path = os.path.join("DivideEtImpera/Test/Logs", str(datetime.datetime.now())[:19])
     os.mkdir(log_path)
     
     solve_SA(log_path)
