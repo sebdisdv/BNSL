@@ -42,7 +42,7 @@ def getSampler(method='SA'):
   if method == 'SA':
     sampler = SimulatedAnnealingSampler()
   elif method == 'QA':
-    sampler = EmbeddingComposite(DWaveSampler(profile=os.getenv('DWAVE_PROFILE'),solver={'topology__type__eq':'pegasus'}))
+    sampler = EmbeddingComposite(DWaveSampler('/home/seb/.config/dwave/dwave.conf',solver={'topology__type__eq':'pegasus'}))
   else:
     sampler = ExactSolver()
   return sampler

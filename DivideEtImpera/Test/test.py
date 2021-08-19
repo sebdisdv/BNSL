@@ -40,7 +40,7 @@ def solve_SA(logs_path):
                 path,
                 SETTINGS["alpha"],
                 SETTINGS["subProblemCardinality"],
-                SPLIT_METHODS["combinations"],
+                SPLIT_METHODS["disposition_with_repetitions"],
             )
             end_time_sub_creation = time.time()
             print("Subproblem Creation time %0.5f" % (end_time_sub_creation - start_time_sub_creation))
@@ -62,7 +62,7 @@ def solve_SA(logs_path):
                     indexQUBO,
                     posOfIndex,
                     label,
-                    method="SA",
+                    method=SETTINGS["method"],
                     nReads=SETTINGS["nReads"],
                     annealTime=SETTINGS["annealTime"],
                 )
@@ -86,7 +86,9 @@ def solve_SA(logs_path):
     sortby = SortKey.CUMULATIVE
     ps = pstats.Stats(pr, stream=s).sort_stats(sortby)
     ps.print_stats()
-    print(s.getvalue())
+    # print(s.getvalue())
+    with open("DivideEtImpera/Test/LogsArchive/stats.txt", "w") as stats:
+        stats.write(s.getvalue())
 
 
 def main():

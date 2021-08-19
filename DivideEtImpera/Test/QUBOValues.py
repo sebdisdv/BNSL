@@ -76,7 +76,7 @@ def getValuesForSubproblems(
     # examples_split = [EXAMPLES[i[0]:i[1]] for i in parts]
     # Il problema è la lista condivisa
     for subprob in subProblemsColIndexes:
-        # print(f"Doing {subprob}\n")
+        print(f"Doing {subprob}\n")
         subProblemsData[subprob] = {}
         subProblemsData[subprob]["n"] = sub_problem_cardinality
         subProblemsData[subprob]["states"] = array([STATES[i] for i in subprob])
@@ -181,6 +181,8 @@ def getExamples(filename):
 
 
 # subsets with max size m=2
+
+
 def calcSubSets(s):
     sSet = [()]
     # all individuals
