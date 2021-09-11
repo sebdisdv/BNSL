@@ -26,8 +26,8 @@ def solve_QA():
 
 def solve_SA(logs_path):
     print("\\" * 100)
-    pr = cProfile.Profile()
-    pr.enable()
+    # pr = cProfile.Profile()
+    # pr.enable()
     for dataset in SETTINGS["datasets"]:
         log_file = open(f"{logs_path}/{dataset}.txt", "w")
         for path in SETTINGS["datasets"][dataset]:
@@ -40,7 +40,7 @@ def solve_SA(logs_path):
                 path,
                 SETTINGS["alpha"],
                 SETTINGS["subProblemCardinality"],
-                SPLIT_METHODS["disposition_with_repetitions"],
+                SPLIT_METHODS["combinations"],
             )
             end_time_sub_creation = time.time()
             print("Subproblem Creation time %0.5f" % (end_time_sub_creation - start_time_sub_creation))
@@ -73,29 +73,31 @@ def solve_SA(logs_path):
             log_file.write("\nAdjMatrixSubproblems: \n")
             log_file.write(pformat(AdjMatrixSubproblems))
             log_file.write("\n\n")
-            AdjMatrixSolution, edgeCount, final_sol_time = recompose(AdjMatrixSubproblems, N)
+            AdjMatrixSolution, edgeCount, final_sol_time, wrongEdgeCount = recompose(AdjMatrixSubproblems, N)
             log_file.write(pformat(edgeCount) + "\n\n")
+            log_file.write(pformat(wrongEdgeCount) + "\n\n")
             log_file.write("\nFinal Solution\n")
             log_file.write(pformat(AdjMatrixSolution))
             print("Final solution recomposition time %0.5f seconds\n%s\n" % (final_sol_time, '\\' * 100))
             save_graph(AdjMatrixSolution, edgeCount, dataset, os.path.basename(path)[:len(os.path.basename(path)) - 4], logs_path, log_file)
             log_file.write("\nFinal solution recomposition time %0.5f seconds\n%s\n" % (final_sol_time, '\\' * 100))
         log_file.close()
-    pr.disable()
-    s = io.StringIO()
-    sortby = SortKey.CUMULATIVE
-    ps = pstats.Stats(pr, stream=s).sort_stats(sortby)
-    ps.print_stats()
+    # pr.disable()
+    # s = io.StringIO()
+    # sortby = SortKey.CUMULATIVE
+    # ps = pstats.Stats(pr, stream=s).sort_stats(sortby)
+    # ps.print_stats()
     # print(s.getvalue())
-    with open("DivideEtImpera/Test/LogsArchive/stats.txt", "w") as stats:
-        stats.write(s.getvalue())
+    # with open("DivideEtImpera/Test/LogsArchive/stats.txt", "w") as stats:
+    #     stats.write(s.getvalue())
 
 
 def main():
-    log_path = os.path.join("DivideEtImpera/Test/Logs", str(datetime.datetime.now())[:19])
-    os.mkdir(log_path)
+    for _ in range(10):
+        log_path = os.path.join("DivideEtImpera/Test/Logs", str(datetime.datetime.now())[:19])
+        os.mkdir(log_path)
     
-    solve_SA(log_path)
+        solve_SA(log_path)
     # solve_QA()
 
 

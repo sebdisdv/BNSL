@@ -92,6 +92,7 @@ def recompose(AdjMatrixSubproblems, N) -> Tuple[List[List[int]], Dict]:
     start_time = time()
     SolAdjMatrix = [[0 for _ in range(N)] for _ in range(N)]
     edgeCount = {}
+    wrongEdgeCount = {}
     for key in AdjMatrixSubproblems:
         subAdj = AdjMatrixSubproblems[key]
         subAdjDim = len(subAdj)
@@ -102,16 +103,26 @@ def recompose(AdjMatrixSubproblems, N) -> Tuple[List[List[int]], Dict]:
                         edgeCount[(key[row], key[col])] += 1
                     except KeyError:
                         edgeCount[(key[row], key[col])] = 1
+                else:
+                    try:
+                        wrongEdgeCount[(key[row], key[col])] += 1
+                    except KeyError:
+                        wrongEdgeCount[(key[row], key[col])] = 1
+    
+
+   
     for edge in edgeCount:
+        if edge not in wrongEdgeCount:
+            wrongEdgeCount[edge] = 0
         try:
             rev_edge = edge[::-1]
-            if edgeCount[edge] > edgeCount[rev_edge] and edgeCount[edge] >= 1:
+            if edgeCount[edge] > edgeCount[rev_edge] and edgeCount[edge] >= 1 and (edgeCount[edge] - wrongEdgeCount[edge] > 0):
                 SolAdjMatrix[edge[0]][edge[1]] = 1
         except KeyError:
-            if edgeCount[edge] >= 1:
+            if edgeCount[edge] >= 1 and (edgeCount[edge] - wrongEdgeCount[edge] > 0):
                 SolAdjMatrix[edge[0]][edge[1]] = 1
     time_delta = time() - start_time
-    return SolAdjMatrix, edgeCount, time_delta
+    return SolAdjMatrix, edgeCount, time_delta, wrongEdgeCount
 
 SPLIT_METHODS = {
     "combinations" : get_variables_combinations,
@@ -119,3 +130,4 @@ SPLIT_METHODS = {
     "permutations" : get_variables_permutations,
     "disposition_with_repetitions": get_variable_disposition_with_repetition
 }
+
