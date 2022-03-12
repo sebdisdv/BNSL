@@ -1,5 +1,6 @@
 import sys
 import os
+from numba.core.decorators import jit
 import torch
 import pprint
 from utils import *
@@ -37,12 +38,12 @@ def getDwaveQubo(Q, indexQUBO):
         qubo[(indexQUBO[i],indexQUBO[j])] = Q[i,j].item()
   return qubo
 
-def getSampler(method='SA'):
+def getSampler(dwave_conf_path, method='SA'):
   sampler = None
   if method == 'SA':
     sampler = SimulatedAnnealingSampler()
   elif method == 'QA':
-    sampler = EmbeddingComposite(DWaveSampler('/home/seb/.config/dwave/dwave.conf',solver={'topology__type__eq':'pegasus'}))
+    sampler = EmbeddingComposite(DWaveSampler(dwave_conf_path,solver={'topology__type__eq':'pegasus'}))
   else:
     sampler = ExactSolver()
   return sampler
@@ -79,20 +80,22 @@ def writeCSV(n, probName, alpha, method, nReads, annealTime, dsName, calcQUBOTim
     testResult = template.format(n,probName,alpha,examples,method,nReads,annealTime,dsName,calcQUBOTime/10**6,annealTimeRes/10**6,readFound,occurrences,minY,expY,minXt.int().tolist())
     file.write(testResult)
 
-def dwaveSolve(Q, indexQUBO, posOfIndex, label, method='SA', nReads=100, annealTime=1):
+
+def dwaveSolve(dwave_conf_path, Q, indexQUBO, posOfIndex, label, method='SA', nReads=100, annealTime=1):
   qubo = getDwaveQubo(Q,indexQUBO)
-  sampler = getSampler(method=method)
+  sampler = getSampler(dwave_conf_path, method=method)
   startAnneal = time_ns()
   if method == 'QA':
     sampleset = sampler.sample_qubo(qubo,num_reads=nReads,label=label,annealing_time=annealTime)
   else:
     sampleset = sampler.sample_qubo(qubo,num_reads=nReads,label=label)
   endAnneal = time_ns()
-  if 'timing' in sampleset.info.keys():
-    print(sampleset.info['timing'])
-    annealTime = sampleset.info['timing']['qpu_access_time']
-  else:
-    annealTime = (endAnneal - startAnneal)//10**3
+  #TODO uncomment this part
+  #if 'timing' in sampleset.info.keys():
+  #  print(sampleset.info['timing'])
+  #  annealTime = sampleset.info['timing']['qpu_access_time']
+  #else:
+  #  annealTime = (endAnneal - startAnneal)//10**3
   minXt = getMinXt(sampleset.first.sample,indexQUBO,posOfIndex)
   minX = minXt.view(-1,1)
   minY = torch.matmul(torch.matmul(minXt,Q),minX).item()

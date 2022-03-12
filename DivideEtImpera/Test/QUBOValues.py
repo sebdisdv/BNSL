@@ -1,23 +1,15 @@
 import math
-import random
-import multiprocessing
-from os import pardir
-from time import time
 
-from pprint import pformat, pprint
-from numba.core.types.containers import List
 from numpy import array
+from numba import jit
 from utils import (
     get_variables_combinations,
     get_variables_combinations_with_replacement,
     get_variables_permutations,
-    split_equal_part
+    split_equal_part,
 )
+from tqdm import tqdm
 
-from numba.typed import List 
-from numba import njit, jit
-
-# MANAGER = multiprocessing.Manager()
 
 def getValues(filename, alpha="1/(ri*qi)"):
     examples, n, states = getExamples(filename)
@@ -36,11 +28,9 @@ def getValues(filename, alpha="1/(ri*qi)"):
     return n, parentSets, w, deltaMax, deltaTrans, deltaConsist
 
 
-
 def fill_examples(shared_list, examples, subprob, n):
     for ex in examples:
         shared_list.append([ex[i] for i in subprob])
-
 
 
 def getValuesForSubproblems(
@@ -49,69 +39,27 @@ def getValuesForSubproblems(
     sub_problem_cardinality=3,
     subproblems_creation_method=get_variables_permutations,
 ):
- 
+
     EXAMPLES, N, STATES = getExamples(filename)
 
-
-    # random.shuffle(EXAMPLES)
-
-    # Examples_dict = {}
-    # for i in range(N):
-    #   Examples_dict[i] = []
-    # for i in range(len(EXAMPLES)):
-    #   for j in range(len(EXAMPLES[i])):
-    #    Examples_dict[j].append(EXAMPLES[i][j])
-    
     subProblemsData = {}
     subProblemsColIndexes = subproblems_creation_method(N, sub_problem_cardinality)
 
-
-    # subProblemsColIndexes = subProblemsColIndexes[:1] # prendo solo il primo sottoproblema per test
-    # breakpoint()
-
-    # MultiPro
     EXAMPLES_LENGHT = len(EXAMPLES)
-    # parts = split_equal_part(EXAMPLES_LENGHT, 2)
-    # split Examples
-    # examples_split = [EXAMPLES[i[0]:i[1]] for i in parts]
-    # Il problema è la lista condivisa
-    for subprob in subProblemsColIndexes:
-        print(f"Doing {subprob}\n")
+
+    for subprob in tqdm(subProblemsColIndexes):
         subProblemsData[subprob] = {}
         subProblemsData[subprob]["n"] = sub_problem_cardinality
         subProblemsData[subprob]["states"] = array([STATES[i] for i in subprob])
-        
-        #multiprocess test
-        # l1 = []
-        # l2 = [] 
-        # proc1 = multiprocessing.Process(target=fill_examples, args=[l1, examples_split[0], subprob, 0])
-        # proc2 = multiprocessing.Process(target= fill_examples, args=[l2, examples_split[1], subprob, 1])
-        # proc1.start()
-        # proc2.start()
-        # proc1.join()
-        # proc2.join()
-        # subProblemsData[subprob]["examples"] = list(itertools.chain(l1,l2))
-        # EXAMPLES[parts[i][0]:parts[i][1]] fare in modo da calcolarlo solo una volta
-       
-        
-        #Normal way
-        
-        subProblemsData[subprob]["examples"] = array(filter_example(subprob, EXAMPLES, EXAMPLES_LENGHT))
-        # subProblemsData[subprob]["examples"] = []
-        # for example in EXAMPLES:
-        #    subProblemsData[subprob]["examples"].append([example[i] for i in subprob])
-        
-        #numpy test(Failed)
-        # subProblemsData[subprob]["examples"] = array([Examples_dict[i] for i in subprob]).T.tolist()
-        # pprint(subProblemsData[subprob]["examples"])
-        # breakpoint()
-        
+
+        subProblemsData[subprob]["examples"] = array(
+            filter_example(subprob, EXAMPLES, EXAMPLES_LENGHT)
+        )
+
         subProblemsData[subprob]["parentSets"] = calcParentSets(
             subProblemsData[subprob]["n"]
         )
-       
-       
-       
+
         subProblemsData[subprob]["w"] = calcW(
             subProblemsData[subprob]["n"],
             subProblemsData[subprob]["parentSets"],
@@ -120,35 +68,27 @@ def getValuesForSubproblems(
             alpha=alpha,
         )
 
-        
-        # del subProblemsData[subprob]["examples"]
-        
         subProblemsData[subprob]["delta"] = calcDelta(
             subProblemsData[subprob]["n"],
             subProblemsData[subprob]["parentSets"],
             subProblemsData[subprob]["w"],
         )
 
-        
         subProblemsData[subprob]["deltaMax"] = calcDeltaMax(
             subProblemsData[subprob]["n"], subProblemsData[subprob]["delta"]
         )
-        
 
-        
         subProblemsData[subprob]["deltaTrans"] = calcDeltaTrans(
             subProblemsData[subprob]["n"], subProblemsData[subprob]["delta"]
         )
-        
 
         subProblemsData[subprob]["deltaConsist"] = calcDeltaConsist(
             subProblemsData[subprob]["n"], subProblemsData[subprob]["deltaTrans"]
         )
-        
-       
     return subProblemsData, N
 
-@jit(nopython= True)
+
+@jit(nopython=True)
 def filter_example(subprob, Examples, lenght):
     res = []
     for i in range(lenght):
@@ -245,7 +185,7 @@ def calcAlphaijSum(alpha, parentSet, i, j, states):
     return sum
 
 
-@jit(nopython= True)
+@jit(nopython=True)
 def calcJthState(j, parentSet, states):
     # ASSUMPTION: all the variables have the same number of states,
     # if this is false, some combinations will be ignored
@@ -256,7 +196,8 @@ def calcJthState(j, parentSet, states):
     sp1 = j % states[p0]
     return sp0, sp1
 
-@jit(nopython= True)
+
+@jit(nopython=True)
 def calcNijk(examples, parentSet, i, j, k, states):
     count = 0
     for example in examples:
@@ -412,7 +353,7 @@ def calcDeltaConsist(n, deltaTrans):
 
 
 def main():
-   pass
+    pass
 
 
 if __name__ == "__main__":
