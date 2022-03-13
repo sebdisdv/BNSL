@@ -170,8 +170,18 @@ def solve(problem, dataset_path, k, method, log_path, number_of_runs):
         log_file.write("\nFinal solution recomposition time %0.5f seconds\n%s\n" % (final_sol_time, '\\' * 100))
         log_file.close()
             
+
+
+def check_folders():
+    if not path.isdir("Logs"):
+        os.mkdir("Logs")
+    if not path.isdir("DatasetDEF"):
+         print("Dataset is missing")
+         exit(1)
+           
     
 def main():
+    check_folders()
     pr = SETTINGS["problems"][select_problem()]
     
     datasets = get_datasets(pr)
